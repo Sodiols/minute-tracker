@@ -1,0 +1,79 @@
+{
+  "name": "minute-windows-tracker",
+  "productName": "Minute Tracker",
+  "private": true,
+  "version": "0.3.1",
+  "description": "Opt-in Windows desktop activity tracker for developers and designers",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "build:css": "tailwindcss -i ./tailwind.input.css -o ./app/tailwind.css --minify",
+    "prestart": "npm run build:css",
+    "dist:win": "npm run build:css && electron-builder --config electron-builder.config.cjs --win nsis --x64 --publish never",
+    "release:win": "node scripts/release.cjs",
+    "verify:package": "node scripts/verify-package.cjs",
+    "test": "node --test test/*.test.cjs",
+    "test:electron": "electron test/electron-smoke.cjs",
+    "test:updates:electron": "electron test/electron-update-smoke.cjs"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.9",
+    "get-windows": "9.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3",
+    "tailwindcss": "4.3.3"
+  },
+  "build": {
+    "appId": "com.minute.wintimer",
+    "productName": "Minute Tracker",
+    "files": [
+      "app/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/get-windows/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "assets/tray.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "npmRebuild": false,
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "enableEmbeddedAsarIntegrityValidation": true,
+      "onlyLoadAppFromAsar": true
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Sodiols/minute-tracker.git"
+  },
+  "overrides": {
+    "@tailwindcss/cli": {
+      "@parcel/watcher": "2.6.0"
+    },
+    "get-windows": {
+      "@mapbox/node-pre-gyp": "2.0.3",
+      "node-gyp": "11.5.0"
+    },
+    "app-builder-lib": {
+      "@electron/get": "5.0.0"
+    }
+  }
+}

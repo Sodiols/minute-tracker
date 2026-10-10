@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+app/tailwind.css
+release/
+audit/
+*.pfx
+*.p12
+.env
+.env.*

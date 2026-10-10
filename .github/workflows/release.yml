@@ -1,0 +1,48 @@
+name: Signed Windows release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: minute-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  windows:
+    runs-on: windows-2025
+    environment: production-release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.16.0'
+          cache: npm
+      - name: Validate release identity
+        shell: pwsh
+        run: |
+          $package = Get-Content package.json -Raw | ConvertFrom-Json
+          $release = Get-Content release-config.json -Raw | ConvertFrom-Json
+          if ($env:GITHUB_REF -ne "refs/tags/v$($package.version)") { throw 'Run from a version tag matching package.json.' }
+          if ($env:GITHUB_REPOSITORY -ne "$($release.owner)/$($release.repo)") { throw 'Release repository mismatch.' }
+          if (!$release.publisherName) { throw 'Configure the legal certificate publisher before publishing production releases.' }
+      - run: npm ci
+      - run: npm audit
+      - run: npm test
+      - name: Build and verify signed NSIS artifacts
+        run: npm run release:win
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+      - name: Create draft release with verified artifacts
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          gh release create "v$version" "release/Minute-Tracker-Setup-$version-x64.exe" "release/Minute-Tracker-Setup-$version-x64.exe.blockmap" "release/latest.yml" --repo $env:GITHUB_REPOSITORY --verify-tag --draft --title "Minute Tracker $version" --generate-notes
+          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }

@@ -1,0 +1,1 @@
+npx skills add https://github.com/Leonxlnx/taste-skill --skill "design-taste-frontend"
