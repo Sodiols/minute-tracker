@@ -1,8 +1,14 @@
-# Minute Tracker — Windows-first desktop prototype
+# Minute Tracker
 
 An Electron desktop companion to the existing HTML, CSS, JavaScript and Tailwind work-session website. The existing manual timer and projects remain separate from the desktop collector.
 
-## Run on Windows 10 or 11
+## Download for Windows
+
+[Download the Minute Tracker 0.3.1 installer for Windows x64](https://github.com/Sodiols/minute-tracker/releases/download/v0.3.1/Minute-Tracker-Setup-0.3.1-x64.exe)
+
+Download and run the installer on Windows 10 or 11. This 0.3.1 release is an **unsigned development/test build**; a verified publisher identity is not yet configured. See the [release page](https://github.com/Sodiols/minute-tracker/releases/tag/v0.3.1) for its files and notes. Once installed, future updates can be checked in **Settings**.
+
+## Run from source on Windows 10 or 11
 
 1. Install Node.js 22.12 or newer and npm (Node 24 is verified).
 2. Unzip the source, open PowerShell or Command Prompt in this folder.
@@ -40,7 +46,7 @@ The automatic activity history is stored in Electron's userData folder as `minut
 
 ## Security model
 
-The Electron renderer has context isolation and sandboxing enabled, and Node integration disabled. A minimal preload bridge allows only known activity commands from the exact local main frame. Permissions, popups, webviews, external navigation and screen capture are denied. The page loads local assets with a restrictive Content Security Policy. Inline styles support the existing chart bars; inline scripts are prohibited. Packaged DevTools, RunAsNode, NODE_OPTIONS and Node inspector arguments are disabled, with ASAR integrity validation enabled. No data leaves the computer unless a user exports it.
+The Electron renderer has context isolation and sandboxing enabled, and Node integration disabled. A minimal preload bridge allows only known activity and update commands from the exact local main frame. Permissions, popups, webviews, external navigation and screen capture are denied. The page loads local assets with a restrictive Content Security Policy. Inline styles support the existing chart bars; inline scripts are prohibited. Packaged DevTools, RunAsNode, NODE_OPTIONS and Node inspector arguments are disabled, with ASAR integrity validation enabled. Projects and activity history remain local unless a user exports them. Installed builds contact GitHub to check for updates and download installers; these requests do not upload tracking data.
 
 Native foreground queries run in an isolated Electron utility process, with a five-second timeout and recycling after 1,800 samples. This bounds upstream get-windows 9.3.0 native buffer/handle retention and keeps native hangs out of the main process. Only the application name crosses back to the collector. Damaged activity history is preserved as a `.bak` file before a fresh store is used; damaged manual workspace data is preserved under a separate localStorage key. These recovery copies remain local and may be removed after recovery.
 

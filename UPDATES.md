@@ -11,6 +11,8 @@ NSIS upgrade before it can discover subsequent releases automatically.
 Unsigned development installers are supported. No legal publisher identity has
 been supplied. Do not describe this build as a signed, production-verified updater.
 See UPDATE-VERIFICATION.md for checks actually performed and outstanding gates.
+The installed unsigned 0.3.0-to-0.3.1 GitHub update was verified on Windows x64 on
+2026-10-11, including download, confirmed restart, NSIS upgrade, and data preservation.
 
 ## User behavior
 
@@ -66,7 +68,7 @@ npm run dist:win
 npm run verify:package
 ```
 
-Artifacts are `release/Minute-Tracker-Setup-0.3.0-x64.exe`, its `.exe.blockmap`, and
+Artifacts are `release/Minute-Tracker-Setup-<version>-x64.exe`, its `.exe.blockmap`, and
 `release/latest.yml`. The packaged `resources/app-update.yml` points to the explicit
 GitHub repository. Do not hand-edit checksums or update manifests. Reproducible here
 means locked dependencies, toolchain, and build procedure, not byte-identical signed

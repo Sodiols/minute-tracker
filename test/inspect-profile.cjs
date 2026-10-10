@@ -12,7 +12,9 @@ app.whenReady().then(async () => {
   await window.loadFile(page);
   const values = await window.webContents.executeJavaScript('({workspace:localStorage.getItem("minute.tracker.v1"),theme:localStorage.getItem("minute.theme")})');
   const data = JSON.parse(values.workspace);
-  const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
+  const canonical = value => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object'
+    ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
+  const hash = value => createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
   const result = {projectCount: data.projects.length, sessionCount: data.sessions.length,
     projectsHash: hash(data.projects), sessionsHash: hash(data.sessions), settingsHash: hash(data.settings),
     timerHash: hash(data.timer), timerStatus: data.timer?.status, timerDuration: data.timer?.segments.reduce((total, segment) => total + ((segment.end ?? data.savedAt) - segment.start), 0),
